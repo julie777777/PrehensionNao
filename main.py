@@ -11,7 +11,7 @@ from optparse import OptionParser
 
 # Generalites du robot
 NAO_IP = "127.0.0.1"
-NAO_PORT = 9559
+NAO_PORT = 64534
 
 # Global variable to store the AudioRecognition module instance
 AudioRecognition = None
@@ -36,7 +36,7 @@ def main():
         type="int")
     parser.set_defaults(
         pip=NAO_IP,
-        pport=9559)
+        pport=64534)
 
     (opts, args_) = parser.parse_args()
     pip   = opts.pip
@@ -59,8 +59,8 @@ def main():
     # Warning: AudioRecognition must be a global variable
     # The name given to the constructor must be the name of the
     # variable
-    
-    
+
+
     AudioRecognition = AudioRecognitionModule("AudioRecognition")
     AudioRecognition.connect(AudioRecognition)
     TactileHead = TactileHeadModule("TactileHead",AudioRecognition)

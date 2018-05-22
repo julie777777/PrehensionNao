@@ -1,7 +1,7 @@
 # -*- encoding: UTF-8 -*-
 # Generalites du robot
 NAO_IP = "127.0.0.1"
-NAO_PORT = 9559
+NAO_PORT = 64534
 
 # Global variable to store the memory module instance
 memory = None
@@ -18,13 +18,13 @@ class AudioRecognitionModule(ALModule):
     cs = 0
     asr = None
     Redballactif = False
-    
+
 
     def __init__(self, name):
         global Redball
         ALModule.__init__(self, name)
         self.tts = ALProxy("ALTextToSpeech")
-        
+
 
 
     def disconnect(self, *_args):
@@ -47,27 +47,27 @@ class AudioRecognitionModule(ALModule):
 
 
 
-        
-        self.tts.setLanguage("French")
-        self.tts.say("Bon, Que la fête commence")
-        
+
+        self.tts.setLanguage("Chinese")
+        self.tts.say("好吧，让派对开始吧。")
+
 
         # Connecting to the Speech recognition module
         self.asr = ALProxy("ALSpeechRecognition",NAO_IP,NAO_PORT)
         # Set the language of recognition to French
-        self.asr.setLanguage("French")
-        # Enable to make a bip is played at the beginning of the recognition process, 
-        # and another bip is played at the end of the process. 
+        self.asr.setLanguage("Chinese")
+        # Enable to make a bip is played at the beginning of the recognition process,
+        # and another bip is played at the end of the process.
         self.asr.setAudioExpression(True)
 
         # The words that have to be recognised by the robot
-        wordList=["On ne joue plus","Suis la balle","Attrape","Dis bonjour Naomie"]
+        wordList=["我们不再玩了","跟着球走","圈套","说你好Nao"]
         # We update the vocabulary list
         # Warning : will crash if the ASR engine is still running
         self.asr.setVocabulary(wordList,False)
 
         # Says the word that can be recognised
-        self.tts.say("Les actions pouvant etre reconnus sont") 
+        self.tts.say("可以识别的行为是")
         for index in range(0,len(wordList)):
             self.tts.say(wordList[index])
 
@@ -94,9 +94,9 @@ class AudioRecognitionModule(ALModule):
         word = memory.getData("WordRecognized")
 
         # Debug : Print the word recognised
-        print("Mot :")
+        print("字：")
         print(word[0])
-        print("Indice de confiance :")
+        print("信心指数：")
         print(word[1])
         print
 
@@ -106,12 +106,9 @@ class AudioRecognitionModule(ALModule):
             self.mot = word[0]
             #self.tts.say("Le mot reconnu est :"+self.mot)
             StateManager(self)
-    
+
 
         # Subscribe again to the event
         memory.subscribeToEvent("WordRecognized",
             "AudioRecognition",
             "onWordRecognised")
-
-
-

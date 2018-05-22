@@ -2,7 +2,7 @@
 # Contient el module de suivi de balle
 
 NAO_IP = "127.0.0.1"
-NAO_PORT = 9559
+NAO_PORT = 64534
 memory = None
 
 from naoqi import ALProxy
@@ -14,7 +14,7 @@ import math
 # Permet de générer un thread s'occupant de gérer le suivi de balle et notamment de la perte de balle
 class maThread(threading.Thread):
     def __init__(self, *args):
-        """Initialisation de la thread, partie qui ne se joue qu'une seule fois."""
+        """Initialisation de la thread, partie qui ne se joue qu'une seule fois.初始化线程，只播放一次"""
         threading.Thread.__init__(self)
         self.running = True
         self.lost = False
@@ -26,10 +26,10 @@ class maThread(threading.Thread):
         self.redBallTracker = ALProxy("ALRedBallTracker", NAO_IP, NAO_PORT)
 
 
-        
+
 
     def run(self):
-        """Partie de programme qui se répète."""
+        """Partie de programme qui se répète.计划的一部分重复。"""
         global memory
         self.postureProxy.applyPosture("Sit",0.5)
         self.motionProxy.setStiffnesses("Head", 1.0)
@@ -41,7 +41,7 @@ class maThread(threading.Thread):
             if self.lost == False:
 
                 #data = memory.getData("redBallDetected",1)
-                
+
                 if self.redBallTracker.isNewData():
                     position = self.redBallTracker.getPosition()
                     self.lost = False
@@ -55,7 +55,7 @@ class maThread(threading.Thread):
                     time.sleep(1.0)
 
                     if (self.countLost > 5):
-                        print "Balle perdue"
+                        print "Balle perdue失去目标"
                         self.lost = True
                         self.countLost = 0
 
@@ -63,7 +63,7 @@ class maThread(threading.Thread):
             if self.lost == True:
             		# Dans le cas ou la balle est perdue de vue, on fait des mouvement de la tête pour la retrouver
                     #TODO : faire un mouvement de la tête et des bras cool
-                    
+
 
                     self.motionProxy.setAngles("HeadYaw", 0, 0.3)
                     self.motionProxy.setAngles("HeadPitch", 0, 0.3)
@@ -80,7 +80,7 @@ class maThread(threading.Thread):
                     else:
                         self.motionProxy.setAngles("HeadYaw", -0.70, 0.5)
                         time.sleep(1.0)
-                    
+
                         if self.redBallTracker.isNewData():
                             self.lost = False
                         else:
@@ -99,12 +99,12 @@ class maThread(threading.Thread):
 
 
     def stop(self):
-        """Permet un arrêt propre de la thread."""
-        
+        """Permet un arrêt propre de la thread.允许一个干净的线程关闭。"""
+
         self.redBallTracker.stopTracker()
         self.redBallTracker = None
         self.running = False
-        
+
 
 
 class RedBallRecognitionModule(ALModule):
@@ -119,7 +119,7 @@ class RedBallRecognitionModule(ALModule):
         self.threadgestion = maThread()
         self.premierefois = True
         self.running = False
-        
+
 
     def disconnect(self, *_args):
         if self.threadgestion != None:
@@ -172,7 +172,7 @@ class RedBallRecognitionModule(ALModule):
 
             # if (objectPos[0] <= 0.18 and objectPos[1] < -0.08):
                 # ball is on the right
-            print "ball is in the right"
+            #print "ball is in the right"
             jointSpeed = 0.2
             names = "Body"
             stiffness = 1.0
@@ -189,18 +189,18 @@ class RedBallRecognitionModule(ALModule):
 
              # Calculate the inverse kinematics for movement
 
-            px = objectPos[0]   
-            py = objectPos[1]   
-            pz = objectPos[2]   
+            px = objectPos[0]
+            py = objectPos[1]
+            pz = objectPos[2]
 
 
-        
-            
+
+
             if px == 0:
                 theta1 = 0
             else:
                 theta1 = math.atan(py/px)
-            
+
             if pz == 0:
                 theta2 = 0
             else:
@@ -214,28 +214,24 @@ class RedBallRecognitionModule(ALModule):
             else:
                 theta4 = 1/(pow(math.cos(theta3),2)-pow(math.sin(theta3),2))
 
-   
+
             self.motionProxy.setAngles("RShoulderPitch", theta1, jointSpeed)
             self.motionProxy.setAngles("RShoulderRoll", theta2, jointSpeed)
             self.motionProxy.setAngles("RElbowYaw", theta3, jointSpeed)
             self.motionProxy.setAngles("RElbowRoll", theta4, jointSpeed)
-            
+
             time.sleep(0.2)
 
             # Open the hand
             time.sleep(1)
             self.motionProxy.setAngles("RHand", 1, jointSpeed)
-            self.tts.say("Je l'ai eu Youpi")
+            self.tts.say("我抓到他了。")
             time.sleep(1)
             self.motionProxy.setAngles("RHand", 0, jointSpeed)
-            
+
             # Get closer to grab the object (Adjust some of the inverse kinematics errors)
 
             # else:
             #     self.tts.say("La balle est hors d'atteinte")
             #     time.sleep(5.0)
             #     self.grabTarget(self)
-
-
-
-
